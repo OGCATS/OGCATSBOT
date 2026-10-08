@@ -121,9 +121,6 @@ async function getItems() {
   return allItems;
 }
 
-  return data.nft_items || [];
-}
-
 bot.command("start", async (ctx) => {
   await ctx.reply(
     "🐱 OG CATS BOT\n\n" +
