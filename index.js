@@ -59,14 +59,67 @@ function getFloor(items) {
   return prices.length ? Math.min(...prices) : null;
 }
 
+function toFriendlyAddress(rawAddress) {
+  const [workchain, hex] = rawAddress.split(":");
+
+  const addressBytes = Buffer.alloc(34);
+  addressBytes[0] = 0x11;
+  addressBytes[1] = Number(workchain);
+  Buffer.from(hex, "hex").copy(addressBytes, 2);
+
+  let crc = 0;
+
+  for (const byte of addressBytes) {
+    crc ^= byte << 8;
+
+    for (let i = 0; i < 8; i++) {
+      crc = (crc & 0x8000)
+        ? ((crc << 1) ^ 0x1021)
+        : (crc << 1);
+
+      crc &= 0xffff;
+    }
+  }
+
+  const result = Buffer.concat([
+    addressBytes,
+    Buffer.from([crc >> 8, crc & 0xff])
+  ]);
+
+  return result
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+}
 function getGetGemsUrl(nft) {
-  return `https://getgems.io/nft/${nft.address}`;
+  const nftAddress = toFriendlyAddress(nft.address);
+
+  return `https://getgems.io/collection/${COLLECTION_ADDRESS}/${nftAddress}`;
 }
 
 async function getItems() {
-  const data = await tonApi(
-    `/nfts/collections/${COLLECTION_ADDRESS}/items?limit=100`
-  );
+  const allItems = [];
+  let offset = 0;
+  const limit = 100;
+
+  while (true) {
+    const data = await tonApi(
+      `/nfts/collections/${COLLECTION_ADDRESS}/items?limit=${limit}&offset=${offset}`
+    );
+
+    const items = data.nft_items || [];
+    allItems.push(...items);
+
+    if (items.length < limit) {
+      break;
+    }
+
+    offset += limit;
+  }
+
+  return allItems;
+}
 
   return data.nft_items || [];
 }
