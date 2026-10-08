@@ -1,0 +1,1 @@
+ { name: "og-cats-floor-bot", version: "1.0.0", description: "OG CATS Floor Telegram Bot", main: "index.js", scripts: { start: "node index.js"}, dependencies: { grammy: "^1.38.3" } }.
