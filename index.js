@@ -1,3 +1,4 @@
+
 const { Bot, InlineKeyboard } = require("grammy");
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -5,6 +6,17 @@ const COLLECTION_ADDRESS =
   "EQBPToJYD439p10lVOj8FJbXr_TACmuNG25P-SMb0MAE7XH2";
 
 const bot = new Bot(BOT_TOKEN);
+
+// Premium emoji
+function premiumEmoji(id, fallback) {
+  return `<tg-emoji emoji-id="${id}">${fallback}</tg-emoji>`;
+}
+
+const CAT = premiumEmoji("5382167047834730380", "🐱");
+const RARE = premiumEmoji("5453927296991792582", "🔹");
+const EPIC = premiumEmoji("5453895424039486644", "🔸");
+const LEGENDARY = premiumEmoji("5454065135377222655", "🟣");
+const LIMITED = premiumEmoji("5453896643810198432", "💎");
 
 async function tonApi(path) {
   const response = await fetch(`https://tonapi.io/v2${path}`);
@@ -22,6 +34,7 @@ function ton(value) {
 
 function formatTon(value) {
   if (value === null || value === undefined) return "—";
+
   return `${value.toLocaleString("en-US", {
     maximumFractionDigits: 2
   })} TON`;
@@ -92,6 +105,7 @@ function toFriendlyAddress(rawAddress) {
     .replace(/\//g, "_")
     .replace(/=/g, "");
 }
+
 function getGetGemsUrl(nft) {
   const nftAddress = toFriendlyAddress(nft.address);
 
@@ -111,9 +125,7 @@ async function getItems() {
     const items = data.nft_items || [];
     allItems.push(...items);
 
-    if (items.length < limit) {
-      break;
-    }
+    if (items.length < limit) break;
 
     offset += limit;
   }
@@ -121,16 +133,88 @@ async function getItems() {
   return allItems;
 }
 
+// START
 bot.command("start", async (ctx) => {
-  await ctx.reply(
-    "🐱 OG CATS BOT\n\n" +
-    "/floor — общий floor коллекции\n" +
-    "/floor 87 — проверить конкретного кота"
-  );
+  const message =
+    `${CAT} <b>OG CATS FLOOR</b>\n\n` +
+    `Collection: 8 TON\n\n` +
+    `<b>FLOOR BY RARITY</b>\n` +
+    `${RARE} Rare — 9.8 TON\n` +
+    `${EPIC} Epic — 8 TON\n` +
+    `${LEGENDARY} Legendary — —\n` +
+    `${LIMITED} Limited — —\n\n` +
+    `Чтобы проверить кота:\n` +
+    `<code>/floor 67</code>`;
+
+  await ctx.reply(message, {
+    parse_mode: "HTML"
+  });
 });
 
+// FLOOR
 bot.command("floor", async (ctx) => {
   try {
+    const argument = ctx.match?.trim();
+
+    // If a number is provided, find that NFT directly.
+    // Otherwise, calculate the collection and rarity floors.
+    if (argument) {
+      const number = Number(argument);
+
+      if (!Number.isInteger(number) || number < 1) {
+        await ctx.reply("Напиши номер NFT, например: /floor 67");
+        return;
+      }
+
+      const items = await getItems();
+
+      const nft = items.find((item) => {
+        const name = item.metadata?.name || item.name || "";
+        return name.includes(`#${number}`);
+      });
+
+      if (!nft) {
+        await ctx.reply(`${CAT} CATS #${number} не найден.`, {
+          parse_mode: "HTML"
+        });
+        return;
+      }
+
+      const collectionFloor = getFloor(items);
+      const nftPrice = getSalePrice(nft);
+
+      let message =
+        `${CAT} <b>CATS #${number}</b>\n\n` +
+        `Collection floor: ${formatTon(collectionFloor)}\n`;
+
+      if (nftPrice !== null) {
+        message +=
+          `NFT price: ${formatTon(nftPrice)}\n` +
+          `Status: ON SALE`;
+
+        const keyboard = new InlineKeyboard().url(
+          "🔗 Open on GetGems",
+          getGetGemsUrl(nft)
+        );
+
+        await ctx.reply(message, {
+          parse_mode: "HTML",
+          reply_markup: keyboard
+        });
+      } else {
+        message +=
+          `NFT price: —\n` +
+          `Status: NOT FOR SALE`;
+
+        await ctx.reply(message, {
+          parse_mode: "HTML"
+        });
+      }
+
+      return;
+    }
+
+    // Collection floor and rarity floors
     const items = await getItems();
 
     const collectionFloor = getFloor(items);
@@ -149,79 +233,30 @@ bot.command("floor", async (ctx) => {
 
     const legendaryFloor = getFloor(
       items.filter(
-        (nft) =>
-          String(getRarity(nft)).toLowerCase() === "legendary"
+        (nft) => String(getRarity(nft)).toLowerCase() === "legendary"
       )
     );
 
     const limitedFloor = getFloor(
       items.filter(
-        (nft) =>
-          String(getRarity(nft)).toLowerCase() === "limited"
+        (nft) => String(getRarity(nft)).toLowerCase() === "limited"
       )
     );
 
-    const argument = ctx.match?.trim();
+    const message =
+      `${CAT} <b>OG CATS FLOOR</b>\n\n` +
+      `Collection: ${formatTon(collectionFloor)}\n\n` +
+      `<b>FLOOR BY RARITY</b>\n` +
+      `${RARE} Rare — ${formatTon(rareFloor)}\n` +
+      `${EPIC} Epic — ${formatTon(epicFloor)}\n` +
+      `${LEGENDARY} Legendary — ${formatTon(legendaryFloor)}\n` +
+      `${LIMITED} Limited — ${formatTon(limitedFloor)}\n\n` +
+      `Чтобы проверить кота:\n` +
+      `<code>/floor 67</code>`;
 
-    if (!argument) {
-      await ctx.reply(
-        `🐱 OG CATS FLOOR\n\n` +
-        `Collection: ${formatTon(collectionFloor)}\n\n` +
-        `FLOOR BY RARITY\n` +
-        `🔹 Rare — ${formatTon(rareFloor)}\n` +
-        `🔸 Epic — ${formatTon(epicFloor)}\n` +
-        `🟣 Legendary — ${formatTon(legendaryFloor)}\n` +
-        `💎 Limited — ${formatTon(limitedFloor)}\n\n` +
-        `Чтобы проверить кота:\n` +
-        `/floor 87`
-      );
-
-      return;
-    }
-
-    const number = Number(argument);
-
-    if (!Number.isInteger(number) || number < 1) {
-      await ctx.reply("Напиши номер NFT, например: /floor 87");
-      return;
-    }
-
-    const nft = items.find((item) => {
-      const name = item.metadata?.name || item.name || "";
-      return name.includes(`#${number}`);
+    await ctx.reply(message, {
+      parse_mode: "HTML"
     });
-
-    if (!nft) {
-      await ctx.reply(`🐱 CATS #${number} не найден.`);
-      return;
-    }
-
-    const nftPrice = getSalePrice(nft);
-
-    let message =
-      `🐱 CATS #${number}\n\n` +
-      `Collection floor: ${formatTon(collectionFloor)}\n`;
-
-    if (nftPrice !== null) {
-      message +=
-        `NFT price: ${formatTon(nftPrice)}\n` +
-        `Status: ON SALE`;
-
-      const keyboard = new InlineKeyboard().url(
-        "🔗 Open on GetGems",
-        getGetGemsUrl(nft)
-      );
-
-      await ctx.reply(message, {
-        reply_markup: keyboard
-      });
-    } else {
-      message +=
-        `NFT price: —\n` +
-        `Status: NOT FOR SALE`;
-
-      await ctx.reply(message);
-    }
   } catch (error) {
     console.error(error);
 
