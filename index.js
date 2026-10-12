@@ -275,7 +275,17 @@ for (const rarity of ["rare", "epic", "legendary", "limited"]) {
     `OG CATS ${rarity}: ${matching.length} NFTs, ${listed.length} on sale`
   );
 }
+for (const rarity of ["legendary", "limited"]) {
+  const nft = items.find(
+    (item) =>
+      String(getRarity(item)).trim().toLowerCase() === rarity &&
+      item.sale
+  );
 
+  if (nft) {
+    console.log(`OG CATS ${rarity} sale data:`, JSON.stringify(nft.sale));
+  }
+}
     const collectionFloor = getFloor(items);
 
     const rareFloor = getFloor(
