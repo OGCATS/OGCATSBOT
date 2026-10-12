@@ -184,6 +184,21 @@ bot.command("floor", async (ctx) => {
 
       const items = await getItems();
 console.log("OG CATS rarity counts:", getRarityCounts(items));
+      
+for (const rarity of ["rare", "epic", "legendary", "limited"]) {
+  const matching = items.filter(
+    (nft) => String(getRarity(nft)).trim().toLowerCase() === rarity
+  );
+
+  const listed = matching.filter(
+    (nft) => getSalePrice(nft) !== null
+  );
+
+  console.log(
+    `OG CATS ${rarity}: ${matching.length} NFTs, ${listed.length} on sale`
+  );
+}
+
       const nft = items.find((item) => {
         const name = item.metadata?.name || item.name || "";
         return name.includes(`#${number}`);
