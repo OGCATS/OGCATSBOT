@@ -51,6 +51,22 @@ function getRarity(nft) {
 
   return rarity?.value || null;
 }
+
+function getRarityCounts(items) {
+  const counts = {};
+
+  for (const nft of items) {
+    const rarity = getRarity(nft);
+
+    if (rarity) {
+      const key = String(rarity).trim().toLowerCase();
+      counts[key] = (counts[key] || 0) + 1;
+    }
+  }
+
+  return counts;
+}
+
 function getSalePrice(nft) {
   if (!nft.sale) return null;
 
@@ -167,7 +183,7 @@ bot.command("floor", async (ctx) => {
       }
 
       const items = await getItems();
-
+console.log("OG CATS rarity counts:", getRarityCounts(items));
       const nft = items.find((item) => {
         const name = item.metadata?.name || item.name || "";
         return name.includes(`#${number}`);
