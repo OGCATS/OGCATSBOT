@@ -107,7 +107,10 @@ function getFloor(items) {
   const prices = items
     .map(getSalePrice)
     .filter((price) => price !== null && price > 0);
-
+console.log("FLOOR DEBUG:", {
+  itemsCount: items.length,
+  prices,
+});
   return prices.length ? Math.min(...prices) : null;
 }
 
