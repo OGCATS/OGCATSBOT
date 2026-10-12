@@ -51,16 +51,6 @@ function getRarity(nft) {
 
   return rarity?.value || null;
 }
-const attributes = nft.metadata?.attributes || [];
-
-  const rarity = attributes.find(
-    (a) =>
-      String(a.trait_type || a.type || "").toLowerCase() === "rarity"
-  );
-
-  return rarity?.value || null;
-}
-
 function getSalePrice(nft) {
   if (!nft.sale) return null;
 
