@@ -326,11 +326,14 @@ for (const rarity of ["legendary", "limited"]) {
       )
     );
 
-    const legendaryFloor = getFloor(
-      items.filter(
-        (nft) => String(getRarity(nft)).toLowerCase() === "legendary"
-      )
-    );
+    
+const legendaryFloor = getFloor(
+  items.filter(
+    (nft) =>
+      String(getRarity(nft)).trim().toLowerCase() === "legendary"
+  )
+);
+
 console.log("Legendary parsed prices:", items
   .filter(nft => String(getRarity(nft)).trim().toLowerCase() === "legendary" && nft.sale)
   .map(nft => getSalePrice(nft))
@@ -340,11 +343,14 @@ console.log("Limited parsed prices:", items
   .filter(nft => String(getRarity(nft)).trim().toLowerCase() === "limited" && nft.sale)
   .map(nft => getSalePrice(nft))
 );
-    const limitedFloor = getFloor(
-      items.filter(
-        (nft) => String(getRarity(nft)).toLowerCase() === "limited"
-      )
-    );
+    
+const limitedFloor = getFloor(
+  items.filter(
+    (nft) =>
+      String(getRarity(nft)).trim().toLowerCase() === "limited"
+  )
+);
+
 
 console.log("OG CATS FLOOR CHECK:", {
   legendaryFloor,
