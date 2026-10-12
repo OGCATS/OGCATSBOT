@@ -51,7 +51,7 @@ function getRarity(nft) {
 
   return rarity?.value || null;
 }
-  const attributes = nft.metadata?.attributes || [];
+const attributes = nft.metadata?.attributes || [];
 
   const rarity = attributes.find(
     (a) =>
