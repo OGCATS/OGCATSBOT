@@ -183,7 +183,21 @@ bot.command("floor", async (ctx) => {
       }
 
       const items = await getItems();
-console.log("OG CATS rarity counts:", getRarityCounts(items));
+
+for (const rarity of ["rare", "epic", "legendary", "limited"]) {
+  const matching = items.filter(
+    (nft) => String(getRarity(nft)).trim().toLowerCase() === rarity
+  );
+
+  const listed = matching.filter(
+    (nft) => getSalePrice(nft) !== null
+  );
+
+  console.log(
+    `OG CATS ${rarity}: ${matching.length} NFTs, ${listed.length} on sale`
+  );
+}
+
       
 for (const rarity of ["rare", "epic", "legendary", "limited"]) {
   const matching = items.filter(
@@ -247,7 +261,21 @@ for (const rarity of ["rare", "epic", "legendary", "limited"]) {
 
     // Collection floor and rarity floors
     const items = await getItems();
-console.log("OG CATS rarity counts:", getRarityCounts(items));
+
+for (const rarity of ["rare", "epic", "legendary", "limited"]) {
+  const matching = items.filter(
+    (nft) => String(getRarity(nft)).trim().toLowerCase() === rarity
+  );
+
+  const listed = matching.filter(
+    (nft) => getSalePrice(nft) !== null
+  );
+
+  console.log(
+    `OG CATS ${rarity}: ${matching.length} NFTs, ${listed.length} on sale`
+  );
+}
+
     const collectionFloor = getFloor(items);
 
     const rareFloor = getFloor(
