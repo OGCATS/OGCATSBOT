@@ -328,7 +328,15 @@ for (const rarity of ["legendary", "limited"]) {
         (nft) => String(getRarity(nft)).toLowerCase() === "legendary"
       )
     );
+console.log("Legendary parsed prices:", items
+  .filter(nft => String(getRarity(nft)).trim().toLowerCase() === "legendary" && nft.sale)
+  .map(nft => getSalePrice(nft))
+);
 
+console.log("Limited parsed prices:", items
+  .filter(nft => String(getRarity(nft)).trim().toLowerCase() === "limited" && nft.sale)
+  .map(nft => getSalePrice(nft))
+);
     const limitedFloor = getFloor(
       items.filter(
         (nft) => String(getRarity(nft)).toLowerCase() === "limited"
