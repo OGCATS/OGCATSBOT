@@ -232,7 +232,7 @@ console.log("OG CATS rarity counts:", getRarityCounts(items));
 
     // Collection floor and rarity floors
     const items = await getItems();
-
+console.log("OG CATS rarity counts:", getRarityCounts(items));
     const collectionFloor = getFloor(items);
 
     const rareFloor = getFloor(
