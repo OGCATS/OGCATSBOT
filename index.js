@@ -343,6 +343,13 @@ console.log("Limited parsed prices:", items
       )
     );
 
+console.log("OG CATS FLOOR CHECK:", {
+  legendaryFloor,
+  limitedFloor,
+  legendaryType: typeof legendaryFloor,
+  limitedType: typeof limitedFloor
+});
+
     const message =
       `${CAT} <b>OG CATS FLOOR</b>\n\n` +
       `Collection: ${formatTon(collectionFloor)}\n\n` +
