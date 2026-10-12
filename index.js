@@ -43,6 +43,16 @@ function formatTon(value) {
 function getRarity(nft) {
   const attributes = nft.metadata?.attributes || [];
 
+  const rarity = attributes.find((a) =>
+    String(a.trait_type || a.type || "")
+      .toLowerCase()
+      .includes("rarity")
+  );
+
+  return rarity?.value || null;
+}
+  const attributes = nft.metadata?.attributes || [];
+
   const rarity = attributes.find(
     (a) =>
       String(a.trait_type || a.type || "").toLowerCase() === "rarity"
