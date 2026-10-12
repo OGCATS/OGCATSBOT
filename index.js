@@ -67,18 +67,41 @@ function getRarityCounts(items) {
   return counts;
 }
 
+
 function getSalePrice(nft) {
-  if (!nft.sale) return null;
+  const sale = nft.sale;
+  if (!sale) return null;
 
-  const value =
-    nft.sale.price?.value ??
-    nft.sale.price ??
-    nft.sale.full_price;
+  const price = sale.price;
 
-  if (!value) return null;
+  if (price && typeof price === "object" && price.value != null) {
+    const decimals = Number(price.decimals ?? 9);
+    const value = Number(price.value);
 
-  return ton(value);
+    if (!Number.isFinite(value) || value <= 0) return null;
+
+    return value / Math.pow(10, decimals);
+  }
+
+  if (typeof price === "string" || typeof price === "number") {
+    const value = Number(price);
+
+    if (!Number.isFinite(value) || value <= 0) return null;
+
+    return value / 1_000_000_000;
+  }
+
+  if (sale.full_price != null) {
+    const value = Number(sale.full_price);
+
+    if (Number.isFinite(value) && value > 0) {
+      return value / 1_000_000_000;
+    }
+  }
+
+  return null;
 }
+
 
 function getFloor(items) {
   const prices = items
