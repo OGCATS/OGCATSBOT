@@ -13,10 +13,11 @@ function premiumEmoji(id, fallback) {
 }
 
 const CAT = premiumEmoji("5382167047834730380", "🐱");
-const RARE = premiumEmoji("5453927296991792582", "🔹");
-const EPIC = premiumEmoji("5453895424039486644", "🔸");
-const LEGENDARY = premiumEmoji("5454065135377222655", "🟣");
-const LIMITED = premiumEmoji("5453896643810198432", "💎");
+const RARE = '<tg-emoji emoji-id="5366575534866210866">🔹</tg-emoji>';
+const EPIC = '<tg-emoji emoji-id="5366550615465960345">🔸</tg-emoji>';
+const LEGENDARY = '<tg-emoji emoji-id="5366381080221886219">🟣</tg-emoji>';
+const LIMITED = '<tg-emoji emoji-id="5366085114025520070">💎</tg-emoji>';
+
 
 async function tonApi(path) {
   const response = await fetch(`https://tonapi.io/v2${path}`);
